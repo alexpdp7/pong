@@ -1,0 +1,17 @@
+Important
+
+Currently everything (pgtap included) needs to be in a schema named "pong".
+
+Tests
+
+Tests need pgtap, to install it on Debian:
+
+$ sudo apt-get install pgxnclient libtap-parser-sourcehandler-pgtap-perl postgresql-server-dev-9.4
+$ sudo pgxn install pgtap
+
+and load /usr/share/postgresql/9.4/extension/pgtap--0.95.0.sql in your
+database.
+
+To run the tests:
+
+$ pg_prove test.sql  # you can use -d dbname to choose the database

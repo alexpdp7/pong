@@ -1,0 +1,1 @@
+/usr/share/postgresql/9.4/extension/pgtap--0.95.0.sql
