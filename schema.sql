@@ -112,3 +112,27 @@ create function check_valid_scorer() returns trigger as $check_valid_scorer$
 $check_valid_scorer$ language plpgsql;
 
 create trigger valid_scores before insert or update on points for each row execute procedure check_valid_scorer();
+
+-- TODO: testing
+-- TODO: sets
+-- TODO: winner
+-- TODO: serving
+create view partial_results as
+with recursive partial_results as (
+  select game_id,
+         0 as team_1_points,
+         0 as team_2_points,
+         started_at as when
+  from   games
+  union all (
+  select partial_results.game_id,
+         partial_results.team_1_points + case when points.team_id = games.team_1_id then 1 else 0 end,
+         partial_results.team_2_points + case when points.team_id = games.team_2_id then 1 else 0 end,
+         points.scored_at as when
+  from   partial_results
+  join   points on partial_results.game_id = points.game_id
+  join   games on points.game_id = games.game_id
+  where  points.scored_at > partial_results.when
+  limit 1)
+)
+select * from partial_results;
