@@ -98,7 +98,7 @@ create table points (
   game_id          uuid not null references games(game_id),
   team_id          uuid not null references teams(team_id),
   scored_at        timestamp with time zone default now(),
-  primary key (game_id, team_id)
+  primary key (game_id, scored_at)
 );
 
 create function check_valid_scorer() returns trigger as $check_valid_scorer$
