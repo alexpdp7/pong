@@ -100,3 +100,15 @@ create table points (
   scored_at        timestamp with time zone default now(),
   primary key (game_id, team_id)
 );
+
+create function check_valid_scorer() returns trigger as $check_valid_scorer$
+  begin
+    perform 1 from games where game_id = new.game_id and new.team_id in (team_1_id, team_2_id);
+    if not found then
+      raise exception 'team % not in game %', new.team_id, new.game_id;
+    end if;
+    return new;
+  end
+$check_valid_scorer$ language plpgsql;
+
+create trigger valid_scores before insert or update on points for each row execute procedure check_valid_scorer();

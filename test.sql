@@ -1,7 +1,7 @@
 begin;
     set search_path=pong;
 
-    select plan(17);
+    select plan(21);
 
     select isa_ok(create_player('joe'), 'uuid');
     select isa_ok(create_player('stu'), 'uuid');
@@ -60,5 +60,27 @@ begin;
 
     select is(count(*)::integer, 2::integer) from games;
 
-    select * from finish();
+    prepare singles_point_insert as insert into points(game_id, team_id)
+                                    select game_id, pl_1_id
+                                    from   games, player_ids
+                                    where  not games.doubles;
+    
+    select lives_ok('singles_point_insert');
+
+    prepare doubles_point_insert as insert into points(game_id, team_id)
+                                    select game_id, dt_1_id
+                                    from   games, doubles_team_ids
+                                    where  games.doubles;
+    
+    select lives_ok('doubles_point_insert');
+
+    prepare bad_point_insert as insert into points(game_id, team_id)
+                                select game_id, dt_1_id
+                                from   games, doubles_team_ids
+                                where  not games.doubles;
+    
+    select throws_ok('bad_point_insert');
+
+    select is(count(*)::integer, 2::integer) from points;
+
 rollback;
